@@ -15,7 +15,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     #[Validate('required|string|email')]
     public string $email = '';
 
-    #[Validate('required|string')]
+    #[Validate('required|string|min:8')]
     public string $password = '';
 
     public bool $remember = false;
@@ -34,6 +34,15 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
+            ]);
+        }
+
+        // Cek apakah pengguna sudah disetujui sebelum masuk
+        $user = Auth::user();
+        if ($user->status !== 'approved') {
+            Auth::logout();
+            throw ValidationException::withMessages([
+                'email' => __('Your account is pending approval. Please wait for admin confirmation.'),
             ]);
         }
 
@@ -98,6 +107,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 :label="__('Password')"
                 type="password"
                 required
+                minlength="8"
                 autocomplete="current-password"
                 :placeholder="__('Password')"
                 viewable

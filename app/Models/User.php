@@ -2,33 +2,35 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, Notifiable;
+    use HasFactory, HasRoles, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+    'name',
+    'email',
+    'password',
+    'status',
+    'role_id',
     ];
+
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<string>
      */
     protected $hidden = [
         'password',
@@ -36,26 +38,38 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    /**
+     * Relationship: User belongs to Role
+     */
+    public function role()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->belongsTo(Role::class);
     }
 
     /**
-     * Get the user's initials
+     * Check if user is super admin
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('super-admin');
+    }
+
+    /**
+     * Get the user's initials.
      */
     public function initials(): string
     {
-        return Str::of($this->name)
-            ->explode(' ')
-            ->map(fn (string $name) => Str::of($name)->substr(0, 1))
+        return collect(explode(' ', $this->name))
+            ->map(fn($name) => Str::substr($name, 0, 1))
             ->implode('');
     }
 }
