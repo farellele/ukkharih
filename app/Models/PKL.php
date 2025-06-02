@@ -20,6 +20,11 @@ class PKL extends Model
         'waktu_selesai',
     ];
 
+    protected $casts = [
+        'waktu_mulai' => 'datetime',
+        'waktu_selesai' => 'datetime',
+    ];
+
     // Definisi relasi
     public function siswa()
     {
@@ -37,23 +42,23 @@ class PKL extends Model
     }
 
     // Booted untuk trigger otomatis di Laravel
-    public static function booted(): void
+    protected static function booted()
     {
         static::creating(function (PKL $pkl) {
-            if (!isset($pkl->siswa_id) || $pkl->newQuery()->where('siswa_id', $pkl->siswa_id)->exists()) {
+            if (!isset($pkl->siswa_id) || PKL::where('siswa_id', $pkl->siswa_id)->first()) {
                 throw new \Exception('Siswa ini sudah memiliki PKL.');
             }
         });
 
         static::created(function (PKL $pkl) {
             if ($pkl->siswa) {
-                $pkl->siswa->update(['status_pkl' => 1]);
+                $pkl->siswa->forceFill(['status_pkl' => 1])->save();
             }
         });
 
         static::deleted(function (PKL $pkl) {
             if ($pkl->siswa) {
-                $pkl->siswa->update(['status_pkl' => 0]);
+                $pkl->siswa->forceFill(['status_pkl' => 0])->save();
             }
         });
     }

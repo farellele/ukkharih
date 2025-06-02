@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\Siswa;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -19,19 +20,35 @@ new #[Layout('components.layouts.auth')] class extends Component {
      */
     public function register(): void
     {
+        // Cek apakah email ada di tabel siswa
+        $siswa = Siswa::where('email', $this->email)->first();
+
+        if (!$siswa) {
+            $this->addError('email', 'Email tidak terdaftar sebagai siswa.');
+            return;
+        }
+
+        // Validasi input user
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // Hash password
         $validated['password'] = Hash::make($validated['password']);
 
-        event(new Registered(($user = User::create($validated))));
+        // Buat user baru
+        $user = User::create($validated);
 
+        // Event Laravel (jika butuh)
+        event(new Registered($user));
+
+        // Redirect ke login
         $this->redirect(route('login'));
     }
-}; ?>
+}; 
+?>
 
 <div class="flex flex-col gap-6">
     <x-auth-header :title="__('Create an account')" :description="__('Enter your details below to create your account')" />
