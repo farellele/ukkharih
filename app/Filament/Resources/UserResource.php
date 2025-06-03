@@ -12,7 +12,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction; // Gunakan DeleteBulkAction untuk bulk delete
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Role;
@@ -53,20 +55,20 @@ class UserResource extends Resource
                 EditAction::make(),
                 DeleteAction::make()
                     ->before(function (?User $record) {
-                        if (is_null($record)) {
+                        if (!$record) {
                             throw new \Exception('Data pengguna tidak ditemukan.');
-                        }
-                        if (!$record instanceof User) {
-                            throw new \Exception('Record bukan instance dari User.');
                         }
                         if ($record->isSuperAdmin()) {
                             throw new \Exception('Super admin tidak bisa dihapus.');
                         }
                     })
+                    ->action(fn (User $record) => $record->delete()) // Gunakan soft delete
                     ->requiresConfirmation(),
+                RestoreAction::make()->visible(fn (User $record) => $record->trashed()),
+                ForceDeleteAction::make()->visible(fn (User $record) => $record->trashed()),
             ])
             ->bulkActions([
-                DeleteBulkAction::make() // Gunakan DeleteBulkAction untuk aksi bulk delete
+                DeleteBulkAction::make()
                     ->before(function ($records) {
                         foreach ($records as $record) {
                             if ($record->isSuperAdmin()) {
@@ -74,6 +76,7 @@ class UserResource extends Resource
                             }
                         }
                     })
+                    ->action(fn ($records) => $records->each->delete()), // Soft delete untuk bulk
             ]);
     }
 

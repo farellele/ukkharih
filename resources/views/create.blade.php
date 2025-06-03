@@ -1,6 +1,13 @@
 <x-layouts.app title="Tambah PKL">
     <h1 class="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">Tambah PKL</h1>
 
+    <!-- Menampilkan pesan error -->
+    @if (session('error'))
+        <div class="p-4 mb-4 text-red-700 bg-red-100 border border-red-400 rounded-lg">
+            <strong>Error:</strong> {{ session('error') }}
+        </div>
+    @endif
+
     <form action="{{ route('pkl.store') }}" method="POST" class="space-y-4">
         @csrf
 

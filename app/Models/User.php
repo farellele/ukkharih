@@ -13,19 +13,20 @@ class User extends Authenticatable
 {
     use HasFactory, HasRoles, Notifiable, SoftDeletes;
 
+    protected $dates = ['deleted_at'];
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<string>
      */
     protected $fillable = [
-    'name',
-    'email',
-    'password',
-    'status',
-    'role_id',
+        'name',
+        'email',
+        'password',
+        'status',
+        'role_id',
     ];
-
 
     /**
      * The attributes that should be hidden for serialization.
