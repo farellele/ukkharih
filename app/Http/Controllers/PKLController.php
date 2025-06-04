@@ -12,20 +12,20 @@ use Carbon\Carbon;
 
 class PKLController extends Controller
 {
+    // Halaman Index PKL
     public function index()
     {
-        $pkls = PKL::with(['siswa', 'industri', 'guru'])->get(); // Optimisasi query dengan eager loading
-        return view('pkl', compact('pkls'));
+        $siswa = Siswa::where('email', Auth::user()->email)->firstOrFail();
+
+        $pkls = PKL::where('siswa_id', $siswa->id)->get();
+
+        return view('pkl', compact('siswa', 'pkls'));
     }
 
+    // Halaman Buat PKL
     public function create()
     {
-        $user = Auth::user();
-        $siswa = Siswa::where('email', $user->email)->first();
-
-        if (!$siswa) {
-            return redirect()->route('pkl')->with('error', 'Anda belum terdaftar sebagai siswa.');
-        }
+        $siswa = Siswa::where('email', Auth::user()->email)->firstOrFail();
 
         $industris = Industri::all();
         $gurus = Guru::all();
@@ -33,46 +33,41 @@ class PKLController extends Controller
         return view('create', compact('siswa', 'industris', 'gurus'));
     }
 
+    // Simpan Data PKL
     public function store(Request $request)
     {
         // Validasi input
-        $validated = $request->validate([
+        $request->validate([
             'industri_id' => 'required|exists:industris,id',
             'guru_id' => 'required|exists:gurus,id',
             'waktu_mulai' => 'required|date',
             'waktu_selesai' => 'required|date|after:waktu_mulai',
         ]);
 
-        // Cari siswa berdasarkan email dari pengguna yang login
-        $siswa = Siswa::where('email', auth()->user()->email)->first();
-
-        if (!$siswa) {
-            return back()->with('error', 'Anda belum terdaftar sebagai siswa.');
-        }
+        // Cari siswa berdasarkan pengguna yang login
+        $siswa = Siswa::where('email', Auth::user()->email)->firstOrFail();
 
         // Cek apakah siswa sudah memiliki PKL
         if (PKL::where('siswa_id', $siswa->id)->exists()) {
-            return back()->with('error', 'Anda sudah memiliki data PKL dan tidak bisa mendaftar ulang.');
+            return redirect()->back()->with('error', 'Anda sudah memiliki data PKL dan tidak bisa mendaftar ulang.');
         }
 
         // Validasi apakah PKL berlangsung minimal 90 hari
-        $waktuMulai = Carbon::parse($validated['waktu_mulai']);
-        $waktuSelesai = Carbon::parse($validated['waktu_selesai']);
-        $selisihHari = $waktuMulai->diffInDays($waktuSelesai);
-
-        if ($selisihHari < 90) {
-            return back()->with('error', 'PKL minimal harus berlangsung selama 90 hari.');
+        $waktuMulai = Carbon::parse($request->waktu_mulai);
+        $waktuSelesai = Carbon::parse($request->waktu_selesai);
+        if ($waktuMulai->diffInDays($waktuSelesai) < 90) {
+            return redirect()->back()->with('error', 'PKL minimal harus berlangsung selama 90 hari.');
         }
 
-        // Simpan data jika validasi berhasil
+        // Simpan data PKL
         PKL::create([
             'siswa_id' => $siswa->id,
-            'industri_id' => $validated['industri_id'],
-            'guru_id' => $validated['guru_id'],
-            'waktu_mulai' => $validated['waktu_mulai'],
-            'waktu_selesai' => $validated['waktu_selesai'],
+            'industri_id' => $request->industri_id,
+            'guru_id' => $request->guru_id,
+            'waktu_mulai' => $request->waktu_mulai,
+            'waktu_selesai' => $request->waktu_selesai,
         ]);
 
-        return redirect()->route('pkl')->with('success', 'Data PKL berhasil ditambahkan.');
+        return redirect()->route('pkl')->with('success', 'Data PKL berhasil ditambahkan!');
     }
 }

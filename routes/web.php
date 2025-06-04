@@ -28,15 +28,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('industris')->group(function () {
         Route::get('/', [IndustriController::class, 'index'])->name('industris');
         Route::get('/industris/create_industris', [IndustriController::class, 'create'])->name('industris.create_industri');
-        Route::post('/industris/store', [IndustriController::class, 'store'])->name('industris.store');
+        Route::post('/store', [IndustriController::class, 'store'])->name('industris.store');
     });
 
     // PKL
     Route::prefix('pkl')->group(function () {
         Route::get('/', [PKLController::class, 'index'])->name('pkl');
-        Route::get('/create', [PKLController::class, 'create'])->middleware('role:siswa')->name('pkl.create');
-        Route::post('/store', [PKLController::class, 'store'])->middleware('role:siswa')->name('pkl.store');
+        Route::get('/pkl/create', [PKLController::class, 'create'])->name('pkl.create');
+        Route::post('/pkl/store', [PKLController::class, 'store'])->name('pkl.store');
     });
+
 
     // Settings dengan Livewire Volt
     Route::prefix('settings')->group(function () {

@@ -46,6 +46,8 @@
         <input type="datetime-local" name="waktu_selesai" id="waktu_selesai" required 
             class="border rounded p-3 w-full text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700 text-lg" />
 
+    <form action="{{ route('pkl.store') }}" method="POST">
+        @csrf
         <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded text-lg font-semibold hover:bg-green-700 transition">
             Simpan
         </button>
