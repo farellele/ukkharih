@@ -8,10 +8,13 @@
     </div>
 
     <div class="mb-4 flex justify-end gap-4">
-        <a href="{{ route('pkl.create') }}" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
-            Tambah PKL
-        </a>
+        @if(isset($siswa) && !$siswa->pkl()->exists())
+            <a href="{{ route('pkl.create', $siswa->id) }}" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+                Tambah PKL
+            </a>
+        @endif
     </div>
+
 
     <div class="overflow-auto bg-white dark:bg-gray-900 rounded-md shadow-md p-6">
         @if ($pkls->isEmpty())

@@ -21,6 +21,6 @@ class Siswa extends Model
         'alamat',
         'kontak',
         'email',
-        'status_pkl',
+        'status_pkl' => 'Belum PKL',
     ];
 }

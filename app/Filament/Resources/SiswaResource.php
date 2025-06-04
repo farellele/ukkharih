@@ -29,7 +29,7 @@ class SiswaResource extends Resource
             Forms\Components\TextInput::make('nis')
                 ->required()
                 ->maxLength(255),
-            Forms\Components\Select::make('gender') // Menggunakan dropdown
+            Forms\Components\Select::make('gender')
                 ->label('Gender')
                 ->options([
                     'Pria' => 'Pria',
@@ -53,24 +53,20 @@ class SiswaResource extends Resource
                     'Sedang PKL' => 'Sedang PKL',
                     'Selesai PKL' => 'Selesai PKL',
                 ])
-                ->required(),
+                ->default('Belum PKL') // Set default status PKL
+                ->disabled(),
             ]);
     }
-
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nama')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('nis')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('nama')->searchable(),
+                Tables\Columns\TextColumn::make('nis')->searchable(),
                 Tables\Columns\TextColumn::make('gender'),
-                Tables\Columns\TextColumn::make('kontak')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('kontak')->searchable(),
+                Tables\Columns\TextColumn::make('email')->searchable(),
                 Tables\Columns\TextColumn::make('status_pkl'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -81,11 +77,13 @@ class SiswaResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                //
-            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('tambah_pkl')
+                    ->label('Tambah PKL')
+                    ->visible(fn ($record) => !$record->pkl()->exists()) // Hanya tampil jika belum PKL
+                    ->url(fn ($record) => route('pkl.create', $record->id))
+                    ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -93,6 +91,7 @@ class SiswaResource extends Resource
                 ]),
             ]);
     }
+
 
     public static function getRelations(): array
     {

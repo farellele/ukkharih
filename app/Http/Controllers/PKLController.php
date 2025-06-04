@@ -20,11 +20,17 @@ class PKLController extends Controller
 
     public function create()
     {
-        $user = Auth::user(); // Mendapatkan pengguna yang sedang login
-        $industris = Industri::all(); // Mengambil daftar industri
-        $gurus = Guru::all(); // Mengambil daftar guru pembimbing
+        $user = Auth::user();
+        $siswa = Siswa::where('email', $user->email)->first();
 
-        return view('create', compact('user', 'industris', 'gurus'));
+        if (!$siswa) {
+            return redirect()->route('pkl')->with('error', 'Anda belum terdaftar sebagai siswa.');
+        }
+
+        $industris = Industri::all();
+        $gurus = Guru::all();
+
+        return view('create', compact('siswa', 'industris', 'gurus'));
     }
 
     public function store(Request $request)

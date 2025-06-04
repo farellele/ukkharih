@@ -9,7 +9,9 @@ class SiswaController extends Controller
 {
     public function index()
     {
-        $siswas = Siswa::all(); // Ambil semua data siswa dari database
-        return view('siswas', compact('siswas')); // Kirimkan ke view
+        // Mengambil data siswa dengan pagination dan urutan berdasarkan nama
+        $siswas = Siswa::orderBy('nama', 'asc')->paginate(10);
+
+        return view('siswas.index', compact('siswas')); // Pastikan view sesuai folder
     }
 }
