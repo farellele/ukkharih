@@ -36,7 +36,6 @@ class PKLController extends Controller
     // Simpan Data PKL
     public function store(Request $request)
     {
-        // Validasi input
         $request->validate([
             'industri_id' => 'required|exists:industris,id',
             'guru_id' => 'required|exists:gurus,id',
@@ -44,22 +43,22 @@ class PKLController extends Controller
             'waktu_selesai' => 'required|date|after:waktu_mulai',
         ]);
 
-        // Cari siswa berdasarkan pengguna yang login
+        // Ambil data siswa yang sedang login
         $siswa = Siswa::where('email', Auth::user()->email)->firstOrFail();
 
-        // Cek apakah siswa sudah memiliki PKL
+        // Cegah siswa yang sudah memiliki PKL
         if (PKL::where('siswa_id', $siswa->id)->exists()) {
             return redirect()->back()->with('error', 'Anda sudah memiliki data PKL dan tidak bisa mendaftar ulang.');
         }
 
-        // Validasi apakah PKL berlangsung minimal 90 hari
+        // Validasi durasi minimal 90 hari
         $waktuMulai = Carbon::parse($request->waktu_mulai);
         $waktuSelesai = Carbon::parse($request->waktu_selesai);
         if ($waktuMulai->diffInDays($waktuSelesai) < 90) {
             return redirect()->back()->with('error', 'PKL minimal harus berlangsung selama 90 hari.');
         }
 
-        // Simpan data PKL
+        // Simpan data PKL ke database
         PKL::create([
             'siswa_id' => $siswa->id,
             'industri_id' => $request->industri_id,
@@ -68,6 +67,10 @@ class PKLController extends Controller
             'waktu_selesai' => $request->waktu_selesai,
         ]);
 
-        return redirect()->route('pkl')->with('success', 'Data PKL berhasil ditambahkan!');
+        // Update status PKL siswa ke "Sedang PKL"
+        $siswa->status_pkl = 'Sedang PKL';
+        $siswa->save();
+
+        return redirect()->route('pkl')->with('success', 'Data PKL berhasil ditambahkan! Status PKL telah diperbarui.');
     }
 }

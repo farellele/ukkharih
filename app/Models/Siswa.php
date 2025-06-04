@@ -22,7 +22,7 @@ class Siswa extends Model
         'alamat',
         'kontak',
         'email',
-        'status_pkl' => 'Belum PKL',
+        'status_pkl',
     ];
 
     public function pkl()

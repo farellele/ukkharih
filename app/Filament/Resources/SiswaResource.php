@@ -53,8 +53,9 @@ class SiswaResource extends Resource
                     'Sedang PKL' => 'Sedang PKL',
                     'Selesai PKL' => 'Selesai PKL',
                 ])
-                ->default('Belum PKL') // Set default status PKL
-                ->disabled(),
+                ->default('Belum PKL')
+                ->disabled()
+                ->dehydrated(false)
             ]);
     }
 

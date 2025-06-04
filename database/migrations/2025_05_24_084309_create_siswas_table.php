@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->string('nis')->unique();
-            $table->enum('gender', ['Pria', 'Wanita']); // Mengubah 'L', 'P' menjadi 'Pria', 'Wanita'
+            $table->enum('gender', ['Pria', 'Wanita']);
             $table->text('alamat');
             $table->string('kontak')->unique();
             $table->string('email');
-            $table->enum('status_pkl', ['Seleksi PKL', 'Sedang PKL', 'Selesai PKL']);
+            $table->enum('status_pkl', ['Belum PKL', 'Sedang PKL', 'Selesai PKL']);
             $table->timestamps();
         });
     }
