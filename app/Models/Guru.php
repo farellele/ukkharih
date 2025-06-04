@@ -24,4 +24,21 @@ class Guru extends Model
         'kontak',
         'email',
     ];
+
+    protected static function booted()
+    {
+    static::updating(function ($guru) {
+            if ($guru->isDirty('email')) {
+                $oldEmail = $guru->getOriginal('email');
+
+                // Cek User dengan email lama
+                $user = \App\Models\User::where('email', $oldEmail)->first();
+
+                if ($guru) {
+                    $guru->email = $guru->email;
+                    $guru->save();
+                }
+            }
+        });
+    }
 }
