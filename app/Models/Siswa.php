@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\PKL;
 
 class Siswa extends Model
 {
@@ -23,4 +24,9 @@ class Siswa extends Model
         'email',
         'status_pkl' => 'Belum PKL',
     ];
+
+    public function pkl()
+    {
+        return $this->hasOne(PKL::class, 'siswa_id');
+    }
 }
