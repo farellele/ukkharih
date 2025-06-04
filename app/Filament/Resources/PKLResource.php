@@ -59,8 +59,16 @@ class PKLResource extends Resource
                 Tables\Columns\TextColumn::make('guru.nama')->label('Guru'),
                 Tables\Columns\TextColumn::make('waktu_mulai')->dateTime()->label('Mulai'),
                 Tables\Columns\TextColumn::make('waktu_selesai')->dateTime()->label('Selesai'),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
+
 
 
     public static function getRelations(): array
