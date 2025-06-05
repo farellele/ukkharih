@@ -78,6 +78,12 @@ class SiswaResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn ($record) => $record->status_pkl !== 'Sedang PKL') // Hanya siswa yang bukan "Sedang PKL" bisa dihapus
+            ])
             
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

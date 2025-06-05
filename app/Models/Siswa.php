@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\PKL;
 
 
+
 class Siswa extends Model
 {
     use HasFactory;
@@ -48,6 +49,16 @@ class Siswa extends Model
 
         $this->attributes['kontak'] = $value;
     }
+
+    public function delete()
+    {
+        if ($this->status_pkl === 'Sedang PKL') {
+            throw new \Exception("Tidak bisa dihapus karena siswa sedang PKL");
+        }
+
+        parent::delete();
+    }
+
     
     protected static function booted()
     {
