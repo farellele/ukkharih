@@ -30,6 +30,24 @@ class Siswa extends Model
     {
         return $this->hasOne(PKL::class, 'siswa_id');
     }
+
+    public function setKontakAttribute($value)
+    {
+        // Hapus spasi dan karakter selain angka dan +
+        $value = preg_replace('/[^0-9+]/', '', $value);
+
+        // Ubah +62 ke 0
+        if (strpos($value, '+62') === 0) {
+            $value = '0' . substr($value, 3);
+        }
+
+        // Ubah jika dimulai dari angka 8 (misal 8123456789) menjadi 08...
+        if (preg_match('/^[1-9]/', $value)) {
+            $value = '0' . $value;
+        }
+
+        $this->attributes['kontak'] = $value;
+    }
     
     protected static function booted()
     {

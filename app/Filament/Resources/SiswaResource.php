@@ -78,14 +78,7 @@ class SiswaResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('tambah_pkl')
-                    ->label('Tambah PKL')
-                    ->visible(fn ($record) => !$record->pkl()->exists()) // Hanya tampil jika belum PKL
-                    ->url(fn ($record) => route('pkl.create', $record->id))
-                    ->button(),
-            ])
+            
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

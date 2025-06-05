@@ -53,7 +53,6 @@ class PKLResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('siswa.nama')->label('Siswa'),
-                Tables\Columns\TextColumn::make('status_pkl')->label('Status PKL')->sortable(),
                 Tables\Columns\TextColumn::make('industri.nama')->label('Industri'),
                 Tables\Columns\TextColumn::make('guru.nama')->label('Guru'),
                 Tables\Columns\TextColumn::make('waktu_mulai')->dateTime()->label('Mulai'),
